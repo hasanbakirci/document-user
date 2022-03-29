@@ -16,4 +16,8 @@
       <Folder Include="Documents" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\core\core.csproj" />
+    </ItemGroup>
+
 </Project>

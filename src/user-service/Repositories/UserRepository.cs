@@ -42,13 +42,21 @@ public class UserRepository : IUserRepository
     public async Task<bool> Update(User user)
     {
         user.UpdatedAt = DateTime.UtcNow;
-        var result = await _user.FindOneAndReplaceAsync(u => u.Id == user.Id, user);
-        return result is null ? false : true;
+        var result = await _user.ReplaceOneAsync(u => u.Id == user.Id, user);
+        if (result.ModifiedCount > 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     public async Task<bool> Delete(Guid id)
     {
         var result = await _user.DeleteOneAsync(u => u.Id == id);
-        return result.DeletedCount < 1 ? false : true;
+        if (result.DeletedCount > 0)
+        {
+            return true;
+        }
+        return false;
     }
 }

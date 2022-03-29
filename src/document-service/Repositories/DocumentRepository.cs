@@ -10,8 +10,8 @@ public class DocumentRepository : IDocumentRepository
     public DocumentRepository(IMongoSettings settings)
     {
         var client = new MongoClient(settings.Server);
-        var databse = client.GetDatabase(settings.Database);
-        _document = databse.GetCollection<Document>(settings.Collection);
+        var database = client.GetDatabase(settings.Database);
+        _document = database.GetCollection<Document>(settings.Collection);
     }
     public async Task<IEnumerable<Document>> GetAll()
     {
@@ -34,13 +34,21 @@ public class DocumentRepository : IDocumentRepository
     public async Task<bool> Update(Document document)
     {
         document.UpdatedAt = DateTime.UtcNow;
-        var result = await _document.FindOneAndReplaceAsync(d => d.Id == document.Id, document);
-        return result is not null ? true : false;
+        var result = await _document.ReplaceOneAsync(d => d.Id == document.Id, document);
+        if (result.ModifiedCount > 0)
+        {
+            return true;
+        }
+        return false;
     }
 
     public async Task<bool> Delete(Guid id)
     {
         var result = await _document.DeleteOneAsync(d => d.Id == id);
-        return result.DeletedCount == 1 ? true : false;
+        if (result.DeletedCount > 0)
+        {
+            return true;
+        }
+        return false;
     }
 }

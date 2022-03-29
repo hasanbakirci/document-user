@@ -1,14 +1,15 @@
-﻿using user_service.Models.Dtos.Requests;
+﻿using core.ServerResponse;
+using user_service.Models.Dtos.Requests;
 using user_service.Models.Dtos.Responses;
 
 namespace user_service.Services;
 
 public interface IUserService
 {
-    Task<IEnumerable<UserResponse>> GetAll();
-    Task<UserResponse> GetById(Guid id);
-    Task<UserResponse> GetByEmail(string request);
-    Task<string> Create(CreateUserRequest request);
-    Task<bool> Update(UpdateUserRequest request);
-    Task<bool> Delete(Guid id);
+    Task<Response<IEnumerable<UserResponse>>> GetAll();
+    Task<Response<UserResponse>> GetById(Guid id);
+    Task<Response<UserResponse>> GetByEmail(string request);
+    Task<Response<string>> Create(CreateUserRequest request);
+    Task<Response<bool>> Update(UpdateUserRequest request);
+    Task<Response<bool>> Delete(Guid id);
 }

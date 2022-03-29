@@ -51,7 +51,7 @@ public static class ConverterExtensions
             Id = request.Id,
             Username = request.Username,
             Password = request.Password,
-            Email = request.Email
+            Email = request.Email,
         };
     }
 }

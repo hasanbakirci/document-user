@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "user-service", "src\user-se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "document-service", "src\document-service\document-service.csproj", "{E862B1AA-AAE4-4A74-A46B-404441EAE694}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "src\core\core.csproj", "{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{E862B1AA-AAE4-4A74-A46B-404441EAE694}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E862B1AA-AAE4-4A74-A46B-404441EAE694}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E862B1AA-AAE4-4A74-A46B-404441EAE694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

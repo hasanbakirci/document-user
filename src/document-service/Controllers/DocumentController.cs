@@ -1,4 +1,5 @@
-﻿using document_service.Models;
+﻿using core.Api;
+using document_service.Models;
 using document_service.Models.Dtos.Requests;
 using document_service.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ namespace document_service.Controllers;
 
 [ApiController]
 [Route("api/[controller]s")]
-public class DocumentController: ControllerBase
+public class DocumentController: ApiController
 {
     private readonly IDocumentService _service;
 
@@ -20,14 +21,14 @@ public class DocumentController: ControllerBase
     public async Task<IActionResult>  GetAll()
     {
         var documents = await _service.GetAll();
-        return Ok(documents);
+        return ApiResponse(documents);
     }
 
     [HttpGet("Search/{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var document = await _service.GetById(id);
-        return Ok(document);
+        return ApiResponse(document);
     }
     
     [HttpPost]
@@ -35,7 +36,7 @@ public class DocumentController: ControllerBase
     {
         var request = new CreateDocumentRequest {FormFile = file, LaterName = description};
         var result = await _service.Create(request);
-        return Created("api/documents",result);
+        return ApiResponse(result);
     }
         
     [HttpPut("{id}")]
@@ -43,13 +44,13 @@ public class DocumentController: ControllerBase
     {
         var request = new UpdateDocumentRequest {FormFile = file, Description = description};
         var result = await _service.Update(id, request);
-        return Ok(result);
+        return ApiResponse(result);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _service.Delete(id);
-        return Ok(result);
+        return ApiResponse(result);
     }
 }

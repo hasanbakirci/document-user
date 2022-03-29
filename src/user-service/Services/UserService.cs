@@ -1,4 +1,5 @@
-﻿using user_service.Extensions;
+﻿using core.ServerResponse;
+using user_service.Extensions;
 using user_service.Models.Dtos.Requests;
 using user_service.Models.Dtos.Responses;
 using user_service.Repositories;
@@ -14,48 +15,71 @@ public class UserService : IUserService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<UserResponse>> GetAll()
+    public async Task<Response<IEnumerable<UserResponse>>> GetAll()
     {
         var users = await _repository.GetAll();
-        return users.ToUsersResponse();
+        return new SuccessResponse<IEnumerable<UserResponse>>(users.ToUsersResponse());
     }
 
-    public async Task<UserResponse> GetById(Guid id)
+    public async Task<Response<UserResponse>> GetById(Guid id)
     {
         var user = await _repository.GetById(id);
-        return user.ToUserResponse();
+        if (user is not null)
+            return new SuccessResponse<UserResponse>(user.ToUserResponse());
+        return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
+
     }
 
-    public async Task<UserResponse> GetByEmail(string request)
+    public async Task<Response<UserResponse>> GetByEmail(string request)
     {
         var user = await _repository.GetByEmail(request);
-        return user.ToUserResponse();
+        if (user is not null)
+            return new SuccessResponse<UserResponse>(user.ToUserResponse());
+        return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
     }
 
-    public async Task<string> Create(CreateUserRequest request)
+    public async Task<Response<string>> Create(CreateUserRequest request)
     {
         var result = GetByEmail(request.Email);
-        if (result.Result.Email != request.Email)
+        if (result.Result.Success)
         {
-           return await _repository.Create(request.ToUser()); 
+            return new ErrorResponse<string>(ResponseStatus.BadRequest,default, ResultMessage.Error);
         }
-
-        return "error";
+        return new SuccessResponse<string>(await _repository.Create(request.ToUser())); 
     }
 
-    public async Task<bool> Update(UpdateUserRequest request)
+    public async Task<Response<bool>> Update(UpdateUserRequest request)
     {
+        var user = GetById(request.Id);
+        if (!user.Result.Success)
+        {
+            return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
+        }
         var result = GetByEmail(request.Email);
-        if (result.Result.Email != request.Email)
+        if (result.Result.Success)
         {
-           return await _repository.Update(request.ToUser()); 
+            return new ErrorResponse<bool>(ResponseStatus.BadRequest,default, ResultMessage.Error);
         }
-        return false;
+
+        var newUser = request.ToUser();
+        newUser.CreatedAt = user.Result.Data.CreatedAt;
+        return new SuccessResponse<bool>(await _repository.Update(newUser));
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<Response<bool>> Delete(Guid id)
     {
-        return await _repository.Delete(id);
+        var user = GetById(id);
+        if (!user.Result.Success)
+        {
+            return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
+        }
+        var result = await _repository.Delete(id);
+        if (result)
+        {
+            return new SuccessResponse<bool>(result);
+        }
+
+        return new ErrorResponse<bool>(result);
     }
     
 }
