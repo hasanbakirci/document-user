@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using user_service.Helper;
 using user_service.Repositories;
 using user_service.Services;
 
@@ -25,6 +26,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IUserService, UserService>();
+        return services;
+    }
+    
+    public static IServiceCollection AddUtilities(this IServiceCollection services)
+    {
+        services.AddSingleton<IJwtHelper, JwtHelper>();
         return services;
     }
 }

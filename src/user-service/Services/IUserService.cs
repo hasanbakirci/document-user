@@ -1,4 +1,5 @@
 ﻿using core.ServerResponse;
+using user_service.Helper;
 using user_service.Models.Dtos.Requests;
 using user_service.Models.Dtos.Responses;
 
@@ -12,4 +13,6 @@ public interface IUserService
     Task<Response<string>> Create(CreateUserRequest request);
     Task<Response<bool>> Update(UpdateUserRequest request);
     Task<Response<bool>> Delete(Guid id);
+    Task<Response<AccessTokenResponse>> Login(LoginRequest request);
+    Response<TokenHandlerResponse> ValidateToken(string request);
 }

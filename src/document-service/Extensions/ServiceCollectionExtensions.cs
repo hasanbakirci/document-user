@@ -1,4 +1,5 @@
 ﻿using Core.Repositories.Settings;
+using document_service.Clients.UserClient;
 using document_service.Repositories;
 using document_service.Services;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDocumentService, DocumentService>();
+        services.AddSingleton<ILoggerService, LoggerService>();
+        return services;
+    }
+    
+    public static IServiceCollection AddClients(this IServiceCollection services)
+    {
+        services.AddSingleton<IUserClient, UserClient>();
+        services.AddHttpClient();
         return services;
     }
 }

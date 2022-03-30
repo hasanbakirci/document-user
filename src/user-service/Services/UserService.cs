@@ -1,5 +1,6 @@
 ﻿using core.ServerResponse;
 using user_service.Extensions;
+using user_service.Helper;
 using user_service.Models.Dtos.Requests;
 using user_service.Models.Dtos.Responses;
 using user_service.Repositories;
@@ -9,10 +10,12 @@ namespace user_service.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
+    private readonly IJwtHelper _jwtHelper;
 
-    public UserService(IUserRepository repository)
+    public UserService(IUserRepository repository, IJwtHelper jwtHelper)
     {
         _repository = repository;
+        _jwtHelper = jwtHelper;
     }
 
     public async Task<Response<IEnumerable<UserResponse>>> GetAll()
@@ -81,5 +84,31 @@ public class UserService : IUserService
 
         return new ErrorResponse<bool>(result);
     }
-    
+
+    public async Task<Response<AccessTokenResponse>> Login(LoginRequest request)
+    {
+        var user = GetByEmail(request.Email);
+        if (!user.Result.Success)
+        {
+            return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,default,ResultMessage.Error);
+        }
+
+        if (user.Result.Data.Password != request.Password)
+        {
+            return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,default,ResultMessage.Error);
+        }
+
+        var accessToken = _jwtHelper.GenereteJwtToken(user.Result.Data.Id, "user");
+        return new SuccessResponse<AccessTokenResponse>(accessToken);
+    }
+
+    public Response<TokenHandlerResponse> ValidateToken(string request)
+    {
+        var result = _jwtHelper.ValidateJwtToken(request);
+        if (result.Status)
+        {
+            return new SuccessResponse<TokenHandlerResponse>(result);
+        }
+        return new ErrorResponse<TokenHandlerResponse>(ResponseStatus.UnAuthorized,null,ResultMessage.UnAuthorized);
+    }
 }

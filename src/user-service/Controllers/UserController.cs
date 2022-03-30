@@ -50,4 +50,18 @@ public class UserController : ApiController
         var result = await _service.Delete(id);
         return ApiResponse(result);
     }
+    
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var result = await _service.Login(request);
+        return ApiResponse(result);
     }
+
+    [HttpPost("ValidateToken")]
+    public IActionResult ValidateToken([FromBody] ValidateTokenRequest request)
+    {
+        var result = _service.ValidateToken(request.token);
+        return ApiResponse(result);
+    }
+}
