@@ -72,7 +72,7 @@ public class DocumentService : IDocumentService
             Description = request.Description,
             CreatedAt = document.Result.Data.CreatedAt
         };
-        var result =await _repository.Update(newDocument);
+        var result =await _repository.Update(id,newDocument);
         if (result)
         {
             return new SuccessResponse<bool>(result);

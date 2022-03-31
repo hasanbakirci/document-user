@@ -1,4 +1,5 @@
-﻿using document_service.Clients.UserClient;
+﻿using document_service.Clients.MessageQueueClient;
+using document_service.Clients.UserClient;
 using document_service.Models;
 using document_service.Models.Dtos.Requests;
 using Newtonsoft.Json;
@@ -9,11 +10,13 @@ public class LoggerService :ILoggerService
 {
     private readonly IDocumentService _documentService;
     private readonly IUserClient _userClient;
+    private readonly IMessageQueueClient _messageQueueClient;
 
-    public LoggerService(IDocumentService documentService, IUserClient userClient)
+    public LoggerService(IDocumentService documentService, IUserClient userClient, IMessageQueueClient messageQueueClient)
     {
         _documentService = documentService;
         _userClient = userClient;
+        _messageQueueClient = messageQueueClient;
     }
 
     public void SendLog(LogRequest request)
@@ -39,5 +42,6 @@ public class LoggerService :ILoggerService
             UserUpdatedAt = user.UpdatedAt
         };
         Console.WriteLine(JsonConvert.SerializeObject(log));
+        _messageQueueClient.Publish<Log>(RabbitMQHelper.LoggerQueue,log);
     }
 }

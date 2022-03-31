@@ -1,13 +1,12 @@
 ﻿using Core.Repositories.Settings;
-using document_service.Clients.MessageQueueClient;
-using document_service.Clients.UserClient;
-using document_service.Repositories;
-using document_service.Services;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using worker_service.Clients.MessageQueueClient;
+using worker_service.Repositories;
+using worker_service.Services;
 
-namespace document_service.Extensions;
+namespace worker_service.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -19,23 +18,21 @@ public static class ServiceCollectionExtensions
         services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
         services.AddSingleton<IMongoSettings>(d=>d.GetRequiredService<IOptions<MongoSettings>>().Value);
             
-        services.AddSingleton<IDocumentRepository, DocumentRepository>();
+        services.AddSingleton<ILoggerRepository, LoggerRepository>();
             
         return services;
     }
-
+    
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddSingleton<IDocumentService, DocumentService>();
         services.AddSingleton<ILoggerService, LoggerService>();
+        services.AddHostedService<Worker>();
         return services;
     }
     
     public static IServiceCollection AddClients(this IServiceCollection services)
     {
-        services.AddSingleton<IUserClient, UserClient>();
         services.AddSingleton<IMessageQueueClient, RabbitMQClient>();
-        services.AddHttpClient();
         return services;
     }
 }

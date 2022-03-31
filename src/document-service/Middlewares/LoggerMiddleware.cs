@@ -42,9 +42,18 @@ public class LoggerMiddleware
                     
                     memStream.Position = 0;
                     string responseBody = new StreamReader(memStream).ReadToEnd();
+                    string id= "";
+                    if (context.Request.Method.Contains("PUT"))
+                    {
+                        id = context.Request.Path.Value.Split('/')[3];
+                    }
+                    else
+                    {
+                        id = responseBody.Split('"')[3];
+                    }
                     _loggerService.SendLog(new LogRequest
                     {
-                        DocumentId = Guid.Parse(responseBody.Split('"')[3]),
+                        DocumentId = Guid.Parse(id),
                         UserId = Guid.Parse(tokenHandlerResponse.Result.Data.Id)
                     });
                     memStream.Position = 0;

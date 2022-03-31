@@ -19,7 +19,8 @@ public class DocumentController: ApiController
 
     [HttpGet]
     public async Task<IActionResult>  GetAll()
-    {
+    { 
+        //this.Request.
         var documents = await _service.GetAll();
         return ApiResponse(documents);
     }
@@ -39,11 +40,11 @@ public class DocumentController: ApiController
         return ApiResponse(result);
     }
         
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(IFormFile file,Guid id, string description)
+    [HttpPut("{id}/{description}")]
+    public async Task<IActionResult> Update(IFormFile file,string id, string description)
     {
         var request = new UpdateDocumentRequest {FormFile = file, Description = description};
-        var result = await _service.Update(id, request);
+        var result = await _service.Update(Guid.Parse(id),request);
         return ApiResponse(result);
     }
 

@@ -31,10 +31,10 @@ public class DocumentRepository : IDocumentRepository
         return document.Id.ToString();
     }
 
-    public async Task<bool> Update(Document document)
+    public async Task<bool> Update(Guid id,Document document)
     {
         document.UpdatedAt = DateTime.UtcNow;
-        var result = await _document.ReplaceOneAsync(d => d.Id == document.Id, document);
+        var result = await _document.ReplaceOneAsync(d => d.Id == id, document);
         if (result.ModifiedCount > 0)
         {
             return true;
