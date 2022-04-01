@@ -28,7 +28,8 @@ public class UserClient : IUserClient
             var result = JsonConvert.DeserializeObject<UserApiResponse<TokenHandlerResponse>>(responseBody);
             return new SuccessResponse<TokenHandlerResponse>(result.Data);
         }
-        throw new UnauthorizedAccessException("Error token");
+        //throw new UnauthorizedAccessException("Error token");
+        return new ErrorResponse<TokenHandlerResponse>(ResponseStatus.UnAuthorized,default, ResultMessage.UnAuthorized);
     }
 
     public async Task<Response<UserHandlerResponse>> SearchUser(Guid id)

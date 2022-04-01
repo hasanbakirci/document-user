@@ -1,4 +1,5 @@
 ﻿using core.Api;
+using document_service.ActionFilters;
 using document_service.Models;
 using document_service.Models.Dtos.Requests;
 using document_service.Services;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace document_service.Controllers;
 
+[TokenFilter]
 [ApiController]
 [Route("api/[controller]s")]
 public class DocumentController: ApiController
@@ -16,7 +18,8 @@ public class DocumentController: ApiController
     {
         _service = service;
     }
-
+    
+    [RoleFilter("admin","user")]
     [HttpGet]
     public async Task<IActionResult>  GetAll()
     { 
@@ -32,6 +35,7 @@ public class DocumentController: ApiController
         return ApiResponse(document);
     }
     
+    [RoleFilter("user")]
     [HttpPost]
     public async Task<IActionResult> Create(IFormFile file, string description)
     {

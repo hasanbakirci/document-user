@@ -18,7 +18,7 @@ public class JwtHelper : IJwtHelper
     }
     public AccessTokenResponse GenereteJwtToken(Guid id, string role)
     {
-        _accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOptions.AccessTokenExpiration);
+        _accessTokenExpiration = DateTime.Now.AddHours(_tokenOptions.AccessTokenExpiration);
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_tokenOptions.SecurityKey);
         var tokenDescriptor = new SecurityTokenDescriptor
