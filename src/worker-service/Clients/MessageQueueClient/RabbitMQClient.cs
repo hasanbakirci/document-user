@@ -34,17 +34,17 @@ public class RabbitMQClient :IMessageQueueClient
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
             var messageObject = JsonConvert.DeserializeObject<T>(message);
-            try
-            {
+            //try
+            // {
                 callback.Invoke(messageObject);
-            }
-            catch (Exception e)
-            {
-                _channel.BasicReject(ea.DeliveryTag, true);
-                throw;
-            }
-
-            _channel.BasicAck(ea.DeliveryTag, true);
+            // }
+            // catch (Exception e)
+            // {
+            //     _channel.BasicReject(ea.DeliveryTag, true);
+            //     throw;
+            // }
+            //
+            // _channel.BasicAck(ea.DeliveryTag, true);
         };
 
         _channel.BasicConsume(queue: queueName,autoAck:true,consumer:consumer);

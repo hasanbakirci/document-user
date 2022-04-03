@@ -11,7 +11,7 @@ public class DocumentRepository : IDocumentRepository
     {
         var client = new MongoClient(settings.Server);
         var database = client.GetDatabase(settings.Database);
-        _document = database.GetCollection<Document>(settings.Collection);
+        _document = database.GetCollection<Document>("Documents");
     }
     public async Task<IEnumerable<Document>> GetAll()
     {
@@ -27,14 +27,22 @@ public class DocumentRepository : IDocumentRepository
     public async Task<string> Create(Document document)
     {
         document.CreatedAt = DateTime.UtcNow;
+        document.UpdatedAt = DateTime.UtcNow;
         await _document.InsertOneAsync(document);
         return document.Id.ToString();
     }
 
     public async Task<bool> Update(Guid id,Document document)
     {
-        document.UpdatedAt = DateTime.UtcNow;
+        var filter = Builders<Document>.Filter.Eq(d => d.Id, id);
+        var update = Builders<Document>.Update
+            .Set(d => d.Name, document.Name)
+            .Set(d => d.Path, document.Path)
+            .Set(d => d.Extension,document.Extension)
+            .Set(d => d.Description,document.Description)
+            .Set(d => d.UpdatedAt, DateTime.UtcNow);
         var result = await _document.ReplaceOneAsync(d => d.Id == id, document);
+        
         if (result.ModifiedCount > 0)
         {
             return true;

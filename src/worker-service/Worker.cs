@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using worker_service.Clients.MessageQueueClient;
+using worker_service.Models;
 using worker_service.Models.Requests;
 using worker_service.Services;
 
@@ -20,10 +21,10 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _messageQueueClient.Subscribe(RabbitMQHelper.LoggerQueue, new Action<CreateLogRequest>(l =>
+            _messageQueueClient.Subscribe(RabbitMQHelper.LoggerQueue, new Action<CreateLogRequest>(log =>
             {
-                _loggerService.Create(l);
-                //Console.WriteLine(JsonConvert.SerializeObject(l));
+                _loggerService.Create(log);
+                Console.WriteLine(JsonConvert.SerializeObject(log));
             }));
             await Task.Delay(1000, stoppingToken);
         }

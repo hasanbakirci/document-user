@@ -1,5 +1,5 @@
 ﻿using core.ServerResponse;
-using document_service.Clients.UserClient;
+using document_service.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -16,11 +16,11 @@ public class RoleFilterAttribute : TypeFilterAttribute
 public class RoleFilter : IAsyncActionFilter
 {
     private readonly string[] _roles;
-    private readonly IUserClient _userClient;
-    public RoleFilter(string[] roles, IUserClient userClient)
+    private readonly IUserService _userService;
+    public RoleFilter(string[] roles, IUserService userService)
     {
         _roles = roles;
-        _userClient = userClient;
+        _userService = userService;
     }
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -31,8 +31,8 @@ public class RoleFilter : IAsyncActionFilter
             context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Token not found."));
             return;
         }
-        var tokenHandlerResponse = _userClient.TokenValidate(token);
-        if (!tokenHandlerResponse.Result.Success || !_roles.ToList().Contains(tokenHandlerResponse.Result.Data.Role))
+        var tokenHandlerResponse = _userService.ValidateToken(token);
+        if (!tokenHandlerResponse.Success || !_roles.ToList().Contains(tokenHandlerResponse.Data.Role))
         {
             //throw new UnauthorizedAccessException();
             context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Invalid token"));

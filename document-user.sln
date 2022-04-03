@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "user-service", "src\user-service\user-service.csproj", "{C9BA542B-DD95-40B8-8B85-12278504D38E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "core", "src\core\core.csproj", "{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "document-service", "src\document-service\document-service.csproj", "{2C1ABF5D-348C-4C51-9DE8-F5275B281696}"
@@ -20,10 +18,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C9BA542B-DD95-40B8-8B85-12278504D38E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9BA542B-DD95-40B8-8B85-12278504D38E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9BA542B-DD95-40B8-8B85-12278504D38E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9BA542B-DD95-40B8-8B85-12278504D38E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0EDF84A-FEB3-42C1-AB2D-A5BF57A20233}.Release|Any CPU.ActiveCfg = Release|Any CPU

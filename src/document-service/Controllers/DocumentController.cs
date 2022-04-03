@@ -19,11 +19,10 @@ public class DocumentController: ApiController
         _service = service;
     }
     
-    [RoleFilter("admin","user")]
+    [RoleFilter("admin","write","user")]
     [HttpGet]
     public async Task<IActionResult>  GetAll()
-    { 
-        //this.Request.
+    {
         var documents = await _service.GetAll();
         return ApiResponse(documents);
     }
@@ -35,20 +34,21 @@ public class DocumentController: ApiController
         return ApiResponse(document);
     }
     
-    [RoleFilter("user")]
+    [RoleFilter("admin","write")]
     [HttpPost]
     public async Task<IActionResult> Create(IFormFile file, string description)
     {
         var request = new CreateDocumentRequest {FormFile = file, LaterName = description};
-        var result = await _service.Create(request);
+        var result = await _service.Create(TokenHandler(Request),request);
         return ApiResponse(result);
     }
-        
+    
+    [RoleFilter("admin")]
     [HttpPut("{id}/{description}")]
     public async Task<IActionResult> Update(IFormFile file,string id, string description)
     {
         var request = new UpdateDocumentRequest {FormFile = file, Description = description};
-        var result = await _service.Update(Guid.Parse(id),request);
+        var result = await _service.Update(TokenHandler(Request),Guid.Parse(id),request);
         return ApiResponse(result);
     }
 
@@ -57,5 +57,11 @@ public class DocumentController: ApiController
     {
         var result = await _service.Delete(id);
         return ApiResponse(result);
+    }
+
+    private string TokenHandler(HttpRequest request)
+    {
+        var token = request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        return token;
     }
 }

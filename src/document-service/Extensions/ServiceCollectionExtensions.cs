@@ -1,6 +1,6 @@
 ﻿using Core.Repositories.Settings;
 using document_service.Clients.MessageQueueClient;
-using document_service.Clients.UserClient;
+using document_service.Helpers.JWT;
 using document_service.Repositories;
 using document_service.Services;
 using Microsoft.Extensions.Options;
@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMongoSettings>(d=>d.GetRequiredService<IOptions<MongoSettings>>().Value);
             
         services.AddSingleton<IDocumentRepository, DocumentRepository>();
+        services.AddSingleton<IUserRepository, UserRepository>();
             
         return services;
     }
@@ -27,15 +28,21 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDocumentService, DocumentService>();
-        services.AddSingleton<ILoggerService, LoggerService>();
+        services.AddSingleton<IUserService, UserService>();
         return services;
     }
     
     public static IServiceCollection AddClients(this IServiceCollection services)
     {
-        services.AddSingleton<IUserClient, UserClient>();
+        //services.AddSingleton<IUserClient, UserClient>();
         services.AddSingleton<IMessageQueueClient, RabbitMQClient>();
         services.AddHttpClient();
+        return services;
+    }
+    
+    public static IServiceCollection AddUtilities(this IServiceCollection services)
+    {
+        services.AddSingleton<IJwtHelper, JwtHelper>();
         return services;
     }
 }

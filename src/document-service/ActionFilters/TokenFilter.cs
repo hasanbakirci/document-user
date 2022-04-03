@@ -1,5 +1,5 @@
 ﻿using core.ServerResponse;
-using document_service.Clients.UserClient;
+using document_service.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -14,11 +14,11 @@ public class TokenFilterAttribute : TypeFilterAttribute
 }
 public class TokenFilter : IAsyncActionFilter
 {
-    private readonly IUserClient _userClient;
+    private readonly IUserService _userService;
 
-    public TokenFilter(IUserClient userClient)
+    public TokenFilter(IUserService userService)
     {
-        _userClient = userClient;
+        _userService = userService;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -31,8 +31,9 @@ public class TokenFilter : IAsyncActionFilter
             context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Token not found."));
             return;
         }
-        var tokenHandlerResponse = _userClient.TokenValidate(token);
-        if (!tokenHandlerResponse.Result.Success)
+
+        var tokenHandlerResponse = _userService.ValidateToken(token);
+        if (!tokenHandlerResponse.Success)
         {
             //throw new UnauthorizedAccessException();
             context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Invalid token"));

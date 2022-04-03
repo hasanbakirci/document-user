@@ -1,4 +1,4 @@
-﻿namespace document_service.Clients.UserClient;
+﻿namespace document_service.Models.Dtos.Responses;
 
 public class TokenHandlerResponse
 {

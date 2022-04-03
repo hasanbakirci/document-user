@@ -32,6 +32,6 @@ public class RabbitMQClient : IMessageQueueClient
     public void Publish<T>(string queueName, T message)
     {
         var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-        _channel.BasicPublish(RabbitMQHelper.LoggerExchange,queueName,null,body);
+        _channel.BasicPublish("",queueName,null,body);
     }
 }

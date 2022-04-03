@@ -8,7 +8,7 @@ public interface IDocumentService
 {
     Task<Response<IEnumerable<DocumentResponse>>> GetAll();
     Task<Response<DocumentResponse>> GetById(Guid id);
-    Task<Response<string>> Create(CreateDocumentRequest request);
-    Task<Response<bool>> Update(Guid id,UpdateDocumentRequest request);
+    Task<Response<string>> Create(string token,CreateDocumentRequest request);
+    Task<Response<bool>> Update(string token,Guid id,UpdateDocumentRequest request);
     Task<Response<bool>> Delete(Guid id);
 }
