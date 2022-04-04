@@ -16,6 +16,5 @@
 
     <ItemGroup>
       <ProjectReference Include="..\core\core.csproj" />
-      <ProjectReference Include="..\log-service\log-service.csproj" />
     </ItemGroup>
 </Project>

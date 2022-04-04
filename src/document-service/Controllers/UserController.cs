@@ -1,4 +1,5 @@
 ﻿using core.Api;
+using document_service.ActionFilters;
 using document_service.Models.Dtos.Requests;
 using document_service.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -36,14 +37,16 @@ public class UserController : ApiController
         var result = await _service.Create(request);
         return ApiResponse(result);
     }
-
+    
+    [RoleFilter("admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id,UpdateUserRequest request)
     { 
         var result = await _service.Update(id,request);
         return ApiResponse(result);
     }
-        
+    
+    [RoleFilter("admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {

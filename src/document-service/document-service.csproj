@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="10.4.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
         <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
         <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />

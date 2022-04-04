@@ -1,7 +1,9 @@
 ﻿using core.ServerResponse;
+using core.Validation;
 using document_service.Extensions;
 using document_service.Helpers.JWT;
 using document_service.Models.Dtos.Requests;
+using document_service.Models.Dtos.Requests.RequestValidations;
 using document_service.Models.Dtos.Responses;
 using document_service.Repositories;
 
@@ -43,6 +45,8 @@ public class UserService : IUserService
 
     public async Task<Response<string>> Create(CreateUserRequest request)
     {
+        ValidationTool.Validate(new CreateUserRequestValidator(),request);
+        
         var result = GetByEmail(request.Email);
         if (result.Result.Success)
         {
@@ -53,6 +57,8 @@ public class UserService : IUserService
 
     public async Task<Response<bool>> Update(Guid id,UpdateUserRequest request)
     {
+        ValidationTool.Validate(new UpdateUserRequestValidator(),request);
+        
         var newUser = request.ToUser();
         var result = await _repository.Update(id, newUser);
         if (result)
@@ -77,6 +83,8 @@ public class UserService : IUserService
 
     public async Task<Response<AccessTokenResponse>> Login(LoginRequest request)
     {
+        ValidationTool.Validate(new LoginRequestValidator(),request);
+        
         var user = GetByEmail(request.Email);
         if (!user.Result.Success)
         {
