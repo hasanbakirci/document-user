@@ -2,5 +2,5 @@
 
 public class ValidateTokenRequest
 {
-    public string token { get; set; }
+    public string? token { get; set; }
 }

@@ -30,7 +30,9 @@ public class UserService : IUserService
     {
         var user = await _repository.GetById(id);
         if (user is not null)
+        {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
+        }
         return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
 
     }
@@ -39,7 +41,9 @@ public class UserService : IUserService
     {
         var user = await _repository.GetByEmail(request);
         if (user is not null)
+        {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
+        }
         return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
     }
 
@@ -65,7 +69,7 @@ public class UserService : IUserService
         {
             return new SuccessResponse<bool>(result);
         }
-            
+        
         return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
     }
 
@@ -77,7 +81,7 @@ public class UserService : IUserService
         {
             return new SuccessResponse<bool>(result);
         }
-
+        
         return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
     }
 

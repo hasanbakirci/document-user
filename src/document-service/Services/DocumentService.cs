@@ -35,7 +35,7 @@ public class DocumentService : IDocumentService
         {
             return new SuccessResponse<DocumentResponse>(document.ToDocumentResponse());
         }
-
+        
         return new ErrorResponse<DocumentResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
     }
 
@@ -57,7 +57,7 @@ public class DocumentService : IDocumentService
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
             return new SuccessResponse<string>(result);
         }
-
+        
         return new ErrorResponse<string>(ResponseStatus.BadRequest,result,ResultMessage.Error);
 
 
@@ -82,7 +82,7 @@ public class DocumentService : IDocumentService
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
             return new SuccessResponse<bool>(result);
         }
-
+        
         return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
     }
 
@@ -93,7 +93,7 @@ public class DocumentService : IDocumentService
         {
             return new SuccessResponse<bool>(result);
         }
-
+        
         return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
     }
 }

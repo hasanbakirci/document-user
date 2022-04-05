@@ -1,6 +1,8 @@
 using core.Middleware;
 using document_service.Extensions;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,15 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Host.UseSerilog((ctx, lc) => lc
+        .MinimumLevel.Override("Microsoft",LogEventLevel.Error)
+        .WriteTo.Console()
+        .WriteTo.File("log.txt")
+        .Enrich.WithProperty("ApplicationName","document-service")
+        //.CreateLogger()
+    //.WriteTo.Seq("http://localhost:5341/") //nugettten seq kurulu olmalı 
+);
 
 var app = builder.Build();
 
