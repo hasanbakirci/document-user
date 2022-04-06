@@ -1,4 +1,5 @@
-﻿using core.ServerResponse;
+﻿using core.Exceptions.CommonExceptions;
+using core.ServerResponse;
 using document_service.Clients.MessageQueueClient;
 using document_service.Extensions;
 using document_service.Helpers;
@@ -49,6 +50,10 @@ public class DocumentService : IDocumentService
             Name = fileResponse.FileName,
             Description = request.LaterName
         };
+        
+        if (!MimeTypeIsValid(document.Extension))
+            throw new MimeTypeException(document.Extension);
+        
         var result =await _repository.Create(document);
         var validateToken = _userService.ValidateToken(token);
         if (result != null && validateToken.Success)
@@ -74,6 +79,10 @@ public class DocumentService : IDocumentService
             Name = fileResponse.FileName,
             Description = request.Description,
         };
+        
+        if (!MimeTypeIsValid(newDocument.Extension))
+            throw new MimeTypeException(newDocument.Extension);
+        
         var result =await _repository.Update(id,newDocument);
         var validateToken = _userService.ValidateToken(token);
         if (result && validateToken.Success)
@@ -95,5 +104,12 @@ public class DocumentService : IDocumentService
         }
         
         return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+    }
+    
+    private bool MimeTypeIsValid(string arg)
+    {
+        string[] mimeType = {".txt",".pdf"};
+        var result = Array.Exists(mimeType, arg.Contains);
+        return result;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Core.Repositories.Settings;
+﻿using core.Exceptions.CommonExceptions;
+using Core.Repositories.Settings;
 using document_service.Models;
 using MongoDB.Driver;
 
@@ -36,7 +37,15 @@ public class UserRepository : IUserRepository
     {
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
-        await _user.InsertOneAsync(user);
+        try
+        {
+            await _user.InsertOneAsync(user);
+        }
+        catch (Exception e)
+        {
+            throw new DuplicateKeyException(user.Email);
+        }
+        
         return user.Id.ToString();
     }
 

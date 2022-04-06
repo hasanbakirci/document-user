@@ -1,4 +1,5 @@
-﻿using core.ServerResponse;
+﻿using core.Exceptions.CommonExceptions;
+using core.ServerResponse;
 using core.Validation;
 using document_service.Extensions;
 using document_service.Helpers.JWT;
@@ -33,7 +34,8 @@ public class UserService : IUserService
         {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
         }
-        return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
+        //return new ErrorResponse<UserResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundUser);
+        throw new DocumentNotFound(id);
 
     }
 
@@ -51,11 +53,12 @@ public class UserService : IUserService
     {
         ValidationTool.Validate(new CreateUserRequestValidator(),request);
         
-        var result = GetByEmail(request.Email);
-        if (result.Result.Success)
-        {
-            return new ErrorResponse<string>(ResponseStatus.BadRequest,default, ResultMessage.Error);
-        }
+        // var result = GetByEmail(request.Email);
+        // if (result.Result.Success)
+        // {
+        //     //return new ErrorResponse<string>(ResponseStatus.BadRequest,default, ResultMessage.Error);
+        //     throw new DuplicateKeyException(request.Email);
+        // }
         return new SuccessResponse<string>(await _repository.Create(request.ToUser())); 
     }
 
@@ -70,7 +73,8 @@ public class UserService : IUserService
             return new SuccessResponse<bool>(result);
         }
         
-        return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
+        //return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
+        throw new DocumentNotFound(id);
     }
 
     public async Task<Response<bool>> Delete(Guid id)
@@ -82,7 +86,8 @@ public class UserService : IUserService
             return new SuccessResponse<bool>(result);
         }
         
-        return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
+        //return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
+        throw new DocumentNotFound(id);
     }
 
     public async Task<Response<AccessTokenResponse>> Login(LoginRequest request)
