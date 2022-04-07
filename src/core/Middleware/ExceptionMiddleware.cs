@@ -46,7 +46,7 @@ public class ExceptionMiddleware
         var response = context.Response;
         response.ContentType = "application/json";
         response.StatusCode = 500;
-        await response.WriteAsync(new ServerError(exception.Message).ToString());
+        await response.WriteAsync(new ErrorDetails(500,5000,"Server Error").ToString());
     }
 
 }

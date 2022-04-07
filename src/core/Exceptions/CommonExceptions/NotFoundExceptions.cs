@@ -1,8 +1,8 @@
 ﻿namespace core.Exceptions.CommonExceptions;
 
-public class DocumentNotFound : NotFound
+public class DocumentNotFound : ErrorDetails
 {
-    public DocumentNotFound(Guid id) : base(4040, $"- {id} was not found.")
+    public DocumentNotFound(Guid id) : base(404,4040, $" {id} was not found.")
     {
     }
 }

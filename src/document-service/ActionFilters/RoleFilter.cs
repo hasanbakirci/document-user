@@ -1,4 +1,5 @@
-﻿using core.ServerResponse;
+﻿using core.Exceptions.CommonExceptions;
+using core.ServerResponse;
 using document_service.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -28,15 +29,17 @@ public class RoleFilter : IAsyncActionFilter
         if (token == null)
         {
             //throw new UnauthorizedAccessException();
-            context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Token not found."));
-            return;
+            //context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Token not found."));
+            //return;
+            throw new NullTokenException();
         }
         var tokenHandlerResponse = _userService.ValidateToken(token);
         if (!tokenHandlerResponse.Success || !_roles.ToList().Contains(tokenHandlerResponse.Data.Role))
         {
             //throw new UnauthorizedAccessException();
-            context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Invalid token"));
-            return;
+            //context.Result = new UnauthorizedObjectResult(new ErrorResponse(ResponseStatus.UnAuthorized,"Invalid token"));
+            //return;
+            throw new InvalidTokenException();
         }
         await next();
     }

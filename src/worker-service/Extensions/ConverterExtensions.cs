@@ -14,6 +14,7 @@ public static class ConverterExtensions
             Extension = request.Extension,
             Path = request.Path,
             DocumentId = request.DocumentId,
+            MimeType = request.MimeType,
             UserId = request.UserId,
             DocumentCreatedAt = request.DocumentCreatedAt,
             DocumentUpdatedAt = request.DocumentUpdatedAt,

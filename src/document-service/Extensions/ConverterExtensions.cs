@@ -15,6 +15,7 @@ public static class ConverterExtensions
             Description = document.Description,
             Extension = document.Extension,
             Path = document.Path,
+            MimeType = document.MimeType,
             CreatedAt = document.CreatedAt,
             UpdatedAt = document.UpdatedAt
         };
@@ -32,6 +33,7 @@ public static class ConverterExtensions
                     Description = d.Description,
                     Extension = d.Extension,
                     Path = d.Path,
+                    MimeType = d.MimeType,
                     CreatedAt = d.CreatedAt,
                     UpdatedAt = d.UpdatedAt
                 }));
@@ -99,6 +101,7 @@ public static class ConverterExtensions
             Description = document.Description,
             Extension = document.Extension,
             Path = document.Path,
+            MimeType = document.MimeType,
             DocumentCreatedAt = document.CreatedAt,
             DocumentUpdatedAt = document.UpdatedAt,
             UserId = Guid.Parse(userId)

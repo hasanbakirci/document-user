@@ -38,7 +38,7 @@ public class DocumentController: ApiController
     [HttpPost]
     public async Task<IActionResult> Create(IFormFile file, string description)
     {
-        var request = new CreateDocumentRequest {FormFile = file, LaterName = description};
+        var request = new CreateDocumentRequest {FormFile = file, Description = description};
         var result = await _service.Create(TokenHandler(Request),request);
         return ApiResponse(result);
     }

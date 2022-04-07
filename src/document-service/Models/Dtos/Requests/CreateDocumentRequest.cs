@@ -3,5 +3,5 @@
 public class CreateDocumentRequest
 {
     public IFormFile FormFile { get; set; }
-    public string? LaterName { get; set; }
+    public string Description { get; set; }
 }

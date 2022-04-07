@@ -37,39 +37,44 @@ public class DocumentService : IDocumentService
             return new SuccessResponse<DocumentResponse>(document.ToDocumentResponse());
         }
         
-        return new ErrorResponse<DocumentResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        //return new ErrorResponse<DocumentResponse>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        throw new DocumentNotFound(id);
     }
 
     public async Task<Response<string>> Create(string token,CreateDocumentRequest request)
     {
+        if (!MimeTypeIsValid(request.FormFile.ContentType))
+            throw new MimeTypeException(request.FormFile.ContentType);
+        
         var fileResponse = await FileHelper.Add(request.FormFile);
         var document = new Document
         {
             Extension = fileResponse.FileExtension,
             Path = fileResponse.FilePath,
             Name = fileResponse.FileName,
-            Description = request.LaterName
+            Description = request.Description,
+            MimeType = request.FormFile.ContentType
         };
-        
-        if (!MimeTypeIsValid(document.Extension))
-            throw new MimeTypeException(document.Extension);
-        
+
         var result =await _repository.Create(document);
         var validateToken = _userService.ValidateToken(token);
-        if (result != null && validateToken.Success)
-        {
-            
+        
+        //if (result != null && validateToken.Success)
+        //{
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
             return new SuccessResponse<string>(result);
-        }
+        //}
         
-        return new ErrorResponse<string>(ResponseStatus.BadRequest,result,ResultMessage.Error);
+        //return new ErrorResponse<string>(ResponseStatus.BadRequest,result,ResultMessage.Error);
 
 
     }
 
     public async Task<Response<bool>> Update(string token,Guid id, UpdateDocumentRequest request)
     {
+        if (!MimeTypeIsValid(request.FormFile.ContentType))
+            throw new MimeTypeException(request.FormFile.ContentType);
+        
         var fileResponse = await FileHelper.Add(request.FormFile);
         var newDocument = new Document
         {
@@ -78,21 +83,20 @@ public class DocumentService : IDocumentService
             Path = fileResponse.FilePath,
             Name = fileResponse.FileName,
             Description = request.Description,
+            MimeType = request.FormFile.ContentType
         };
-        
-        if (!MimeTypeIsValid(newDocument.Extension))
-            throw new MimeTypeException(newDocument.Extension);
         
         var result =await _repository.Update(id,newDocument);
         var validateToken = _userService.ValidateToken(token);
+        
         if (result && validateToken.Success)
         {
-            
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
             return new SuccessResponse<bool>(result);
         }
         
-        return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        //return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        throw new DocumentNotFound(id);
     }
 
     public async Task<Response<bool>> Delete(Guid id)
@@ -103,12 +107,18 @@ public class DocumentService : IDocumentService
             return new SuccessResponse<bool>(result);
         }
         
-        return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        //return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        throw new DocumentNotFound(id);
     }
     
     private bool MimeTypeIsValid(string arg)
     {
-        string[] mimeType = {".txt",".pdf"};
+        string[] mimeType = {"application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","text/plain"};
+        /*
+         * application/msword .doc
+         * application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx
+         * text/plain .txt
+         */
         var result = Array.Exists(mimeType, arg.Contains);
         return result;
     }

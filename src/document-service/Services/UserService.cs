@@ -97,12 +97,14 @@ public class UserService : IUserService
         var user = GetByEmail(request.Email);
         if (!user.Result.Success)
         {
-            return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,null,ResultMessage.Error);
+            //return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,null,ResultMessage.Error);
+            throw new LoginException();
         }
 
         if (user.Result.Data.Password != request.Password)
         {
-            return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,null,ResultMessage.Error);
+            //return new ErrorResponse<AccessTokenResponse>(ResponseStatus.NotFound,null,ResultMessage.Error);
+            throw new LoginException();
         }
 
         var accessToken = _jwtHelper.GenereteJwtToken(user.Result.Data.Id, user.Result.Data.Role);
@@ -117,6 +119,7 @@ public class UserService : IUserService
         {
             return new SuccessResponse<TokenHandlerResponse>(result);
         }
-        return new ErrorResponse<TokenHandlerResponse>(ResponseStatus.UnAuthorized,result,ResultMessage.UnAuthorized);
+        //return new ErrorResponse<TokenHandlerResponse>(ResponseStatus.UnAuthorized,result,ResultMessage.UnAuthorized);
+        throw new InvalidTokenException();
     }
 }

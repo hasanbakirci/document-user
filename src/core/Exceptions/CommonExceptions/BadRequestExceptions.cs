@@ -1,23 +1,30 @@
 ﻿namespace core.Exceptions.CommonExceptions;
 
-public class ValidateException : BadRequest
+public class ValidateException : ErrorDetails
 {
-    public ValidateException(string errorMessage) : base(4001, errorMessage)
+    public ValidateException(string errorMessage) : base(400,4001, errorMessage)
     {
     }
     
 }
 
-public class MimeTypeException : BadRequest
+public class MimeTypeException : ErrorDetails
 {
-    public MimeTypeException(string errorMessage) : base(4002, "wrong file format, only .txt or .pdf can be uploaded")
+    public MimeTypeException(string errorMessage) : base(400,4002, "wrong file format, only .txt or .word can be uploaded")
     {
     }
 }
 
-public class DuplicateKeyException : BadRequest
+public class DuplicateKeyException : ErrorDetails
 {
-    public DuplicateKeyException(string value) : base(4003, $"{value} was already exists")
+    public DuplicateKeyException(string value) : base(400,4003, $"{value} was already exists")
+    {
+    }
+}
+
+public class LoginException : ErrorDetails
+{
+    public LoginException() : base(400,4004, $"Your email or password is incorrect")
     {
     }
 }
