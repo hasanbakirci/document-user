@@ -1,8 +1,10 @@
-﻿namespace worker_service.Models;
+﻿using core.Mongo;
 
-public class Log
+namespace worker_service.Models;
+
+public class Log : BaseDocument
 {
-    public Guid id { get; set; }
+    //public Guid id { get; set; }
     public string DocumentId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }

@@ -29,7 +29,7 @@ public class UserService : IUserService
 
     public async Task<Response<UserResponse>> GetById(Guid id)
     {
-        var user = await _repository.GetById(id);
+        var user = await _repository.GetBy(u => u.Id == id);
         if (user is not null)
         {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
@@ -41,7 +41,7 @@ public class UserService : IUserService
 
     public async Task<Response<UserResponse>> GetByEmail(string request)
     {
-        var user = await _repository.GetByEmail(request);
+        var user = await _repository.GetBy(u => u.Email.ToLower() == request.ToLower());
         if (user is not null)
         {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
@@ -53,13 +53,14 @@ public class UserService : IUserService
     {
         ValidationTool.Validate(new CreateUserRequestValidator(),request);
         
-        // var result = GetByEmail(request.Email);
-        // if (result.Result.Success)
-        // {
-        //     //return new ErrorResponse<string>(ResponseStatus.BadRequest,default, ResultMessage.Error);
-        //     throw new DuplicateKeyException(request.Email);
-        // }
-        return new SuccessResponse<string>(await _repository.Create(request.ToUser())); 
+        var user = await GetByEmail(request.Email);
+        if (user.Success)
+        {
+            //return new ErrorResponse<string>(ResponseStatus.BadRequest,default, ResultMessage.Error);
+            throw new DuplicateKeyException(request.Email);
+        }
+        var result = await _repository.InsertOne(request.ToUser());
+        return new SuccessResponse<string>(result.Id.ToString()); 
     }
 
     public async Task<Response<bool>> Update(Guid id,UpdateUserRequest request)
@@ -67,10 +68,16 @@ public class UserService : IUserService
         ValidationTool.Validate(new UpdateUserRequestValidator(),request);
         
         var newUser = request.ToUser();
-        var result = await _repository.Update(id, newUser);
-        if (result)
+        var result = await _repository.UpdateOne(
+            u => u.Id == id,
+            (u => u.Username, request.Username),
+            (u => u.Password, request.Password),
+            (u => u.Role, request.Role)
+            );
+        
+        if (result > 0)
         {
-            return new SuccessResponse<bool>(result);
+            return new SuccessResponse<bool>(true);
         }
         
         //return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);
@@ -80,10 +87,10 @@ public class UserService : IUserService
     public async Task<Response<bool>> Delete(Guid id)
     {
         
-        var result = await _repository.Delete(id);
-        if (result)
+        var result = await _repository.DeleteOne(u => u.Id == id);
+        if (result > 0)
         {
-            return new SuccessResponse<bool>(result);
+            return new SuccessResponse<bool>(true);
         }
         
         //return new ErrorResponse<bool>(ResponseStatus.NotFound, result, ResultMessage.NotFoundUser);

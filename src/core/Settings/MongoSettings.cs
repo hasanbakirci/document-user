@@ -1,4 +1,4 @@
-﻿namespace Core.Repositories.Settings;
+﻿namespace core.Settings;
 
 public class MongoSettings : IMongoSettings
 {

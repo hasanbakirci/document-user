@@ -4,18 +4,11 @@ namespace core.Mongo.MongoRepository;
 
 public interface IMongoRepository<T> where T : class
 {
-    List<T> FindAll();
-    Task<List<T>> FindAllAsync();
-    T FindById(Guid id);
-    Task<T> FindByIdAsync(Guid id);
-    List<T> FilterBy(Expression<Func<T, bool>> filter);
-    Task<List<T>> FilterByAsync(Expression<Func<T, bool>> filter);
-    T InsertOne(T document);
-    Task<T> InsertOneAsync(T document);
-    bool UpdateOne(Expression<Func<T, bool>> expression, params (Expression<Func<T, object>>, object)[] updatedProperties);
-    Task<bool> UpdateOneAsync(Expression<Func<T, bool>> expression, params (Expression<Func<T, object>>, object)[] updatedProperties);
-    bool ReplaceOne(Guid id,T document);
-    Task<bool> ReplaceOneAsync(Guid id,T document);
-    bool DeleteOne(Guid id);
-    Task<bool> DeleteOneAsync(Guid id);
+    Task<List<T>> GetAll();
+    Task<T> GetBy(Expression<Func<T, bool>> expression);
+    Task<List<T>> FilterBy(Expression<Func<T, bool>> filter);
+    Task<T> InsertOne(T document);
+    Task<float> UpdateOne(Expression<Func<T, bool>> expression, params (Expression<Func<T, object>>, object)[] updatedProperties);
+    Task<float> ReplaceOne(Expression<Func<T, bool>> expression,T document);
+    Task<float> DeleteOne(Expression<Func<T, bool>> expression);
 }

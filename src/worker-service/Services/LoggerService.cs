@@ -15,6 +15,6 @@ public class LoggerService: ILoggerService
 
     public void Create(CreateLogRequest request)
     {
-        _loggerRepository.Create(request.ToLog());
+        _loggerRepository.InsertOne(request.ToLog());
     }
 }

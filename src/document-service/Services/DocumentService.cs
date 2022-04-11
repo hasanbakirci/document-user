@@ -31,7 +31,7 @@ public class DocumentService : IDocumentService
 
     public async Task<Response<DocumentResponse>> GetById(Guid id)
     {
-        var document = await _repository.GetById(id);
+        var document = await _repository.GetBy(d => d.Id == id);
         if (document is not null)
         {
             return new SuccessResponse<DocumentResponse>(document.ToDocumentResponse());
@@ -55,14 +55,14 @@ public class DocumentService : IDocumentService
             Description = request.Description,
             MimeType = request.FormFile.ContentType
         };
-
-        var result =await _repository.Create(document);
+        
         var validateToken = _userService.ValidateToken(token);
+        var result =await _repository.InsertOne(document);
         
         //if (result != null && validateToken.Success)
         //{
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
-            return new SuccessResponse<string>(result);
+            return new SuccessResponse<string>(result.Id.ToString());
         //}
         
         //return new ErrorResponse<string>(ResponseStatus.BadRequest,result,ResultMessage.Error);
@@ -86,13 +86,20 @@ public class DocumentService : IDocumentService
             MimeType = request.FormFile.ContentType
         };
         
-        var result =await _repository.Update(id,newDocument);
         var validateToken = _userService.ValidateToken(token);
-        
-        if (result && validateToken.Success)
+        var result =await _repository.UpdateOne(
+            d => d.Id == id,
+            (d => d.Description, newDocument.Description),
+            (d => d.Extension, newDocument.Extension),
+            (d => d.Path, newDocument.Path),
+            (d => d.Name, newDocument.Name),
+            (d => d.MimeType,newDocument.MimeType)
+            );
+
+        if (result > 0 && validateToken.Success)
         {
             _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
-            return new SuccessResponse<bool>(result);
+            return new SuccessResponse<bool>(true);
         }
         
         //return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
@@ -101,13 +108,13 @@ public class DocumentService : IDocumentService
 
     public async Task<Response<bool>> Delete(Guid id)
     {
-        var result = await _repository.Delete(id);
-        if (result)
+        var result = await _repository.DeleteOne(d => d.Id == id);
+        if (result > 0)
         {
-            return new SuccessResponse<bool>(result);
+            return new SuccessResponse<bool>(true);
         }
         
-        //return new ErrorResponse<bool>(ResponseStatus.NotFound, default, ResultMessage.NotFoundDocument);
+        //return new ErrorResponse<bool>(ResponseStatus.NotFound, false, ResultMessage.NotFoundDocument);
         throw new DocumentNotFound(id);
     }
     

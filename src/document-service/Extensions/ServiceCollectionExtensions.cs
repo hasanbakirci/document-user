@@ -1,11 +1,11 @@
-﻿using Core.Repositories.Settings;
+﻿using core.Mongo.MongoContext;
+using core.Mongo.MongoSettings;
 using document_service.Clients.MessageQueueClient;
 using document_service.Helpers.JWT;
 using document_service.Repositories;
 using document_service.Services;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
+using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 
 namespace document_service.Extensions;
 
@@ -13,11 +13,18 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRepositories(this IServiceCollection services, IConfiguration configuration)
     {
-        BsonSerializer.RegisterSerializer(new GuidSerializer(MongoDB.Bson.BsonType.String));
-        BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(MongoDB.Bson.BsonType.String));
+        // BsonSerializer.RegisterSerializer(new GuidSerializer(MongoDB.Bson.BsonType.String));
+        // BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(MongoDB.Bson.BsonType.String));
+        //
+        // services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
+        // services.AddSingleton<IMongoSettings>(d=>d.GetRequiredService<IOptions<MongoSettings>>().Value);
+        MongoSettings settings = configuration.GetSection("MongoSettings").Get<MongoSettings>();
+        services.AddSingleton(settings);
 
-        services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
-        services.AddSingleton<IMongoSettings>(d=>d.GetRequiredService<IOptions<MongoSettings>>().Value);
+        var mongoClient = new MongoClient(settings.Server);
+        var mongoContext = new MongoContext(mongoClient, settings.Database);
+
+        services.AddSingleton<IMongoContext, MongoContext>(m => mongoContext);
             
         services.AddSingleton<IDocumentRepository, DocumentRepository>();
         services.AddSingleton<IUserRepository, UserRepository>();
@@ -43,6 +50,34 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddUtilities(this IServiceCollection services)
     {
         services.AddSingleton<IJwtHelper, JwtHelper>();
+        
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Description = "Bearer Authentication with JWT Token",
+                Type = SecuritySchemeType.Http
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        } 
+                    },
+                    new List<string>()
+                }
+            });
+        });
+        
         return services;
     }
 }
