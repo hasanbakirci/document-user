@@ -29,7 +29,8 @@ public class UserService : IUserService
 
     public async Task<Response<UserResponse>> GetById(Guid id)
     {
-        var user = await _repository.GetBy(u => u.Id == id);
+        //var user = await _repository.GetBy(u => u.Id == id);
+        var user = await _repository.GetById(id);
         if (user is not null)
         {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
@@ -41,7 +42,8 @@ public class UserService : IUserService
 
     public async Task<Response<UserResponse>> GetByEmail(string request)
     {
-        var user = await _repository.GetBy(u => u.Email.ToLower() == request.ToLower());
+        //var user = await _repository.GetBy(u => u.Email.ToLower() == request.ToLower());
+        var user = await _repository.GetByEmail(request);
         if (user is not null)
         {
             return new SuccessResponse<UserResponse>(user.ToUserResponse());
@@ -68,14 +70,15 @@ public class UserService : IUserService
         ValidationTool.Validate(new UpdateUserRequestValidator(),request);
         
         var newUser = request.ToUser();
-        var result = await _repository.UpdateOne(
-            u => u.Id == id,
-            (u => u.Username, request.Username),
-            (u => u.Password, request.Password),
-            (u => u.Role, request.Role)
-            );
+        // var result = await _repository.UpdateOne(
+        //     u => u.Id == id,
+        //     (u => u.Username, request.Username),
+        //     (u => u.Password, request.Password),
+        //     (u => u.Role, request.Role)
+        //     );
+        var result = await _repository.UpdateUser(id, newUser);
         
-        if (result > 0)
+        if (result)
         {
             return new SuccessResponse<bool>(true);
         }
@@ -87,8 +90,9 @@ public class UserService : IUserService
     public async Task<Response<bool>> Delete(Guid id)
     {
         
-        var result = await _repository.DeleteOne(u => u.Id == id);
-        if (result > 0)
+        //var result = await _repository.DeleteOne(u => u.Id == id);
+        var result = await _repository.DeleteById(id);
+        if (result)
         {
             return new SuccessResponse<bool>(true);
         }

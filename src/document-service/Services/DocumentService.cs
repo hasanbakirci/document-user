@@ -37,7 +37,8 @@ public class DocumentService : IDocumentService
 
     public async Task<core.ServerResponse.Response<DocumentResponse>> GetById(Guid id)
     {
-        var document = await _repository.GetBy(d => d.Id == id);
+        //var document = await _repository.GetBy(d => d.Id == id);
+        var document = await _repository.GetById(id);
         if (document is not null)
         {
             return new SuccessResponse<DocumentResponse>(document.ToDocumentResponse());
@@ -96,16 +97,17 @@ public class DocumentService : IDocumentService
         
         var validateToken = _userService.ValidateToken(token);
         //var filter = new[] {((Expression<Func<Document, object>>, object)) (d => d.Extension, newDocument.Extension)};
-        var result =await _repository.UpdateOne(
-            d => d.Id == id,
-            (d => d.Description, newDocument.Description),
-            (d => d.Extension, newDocument.Extension),
-            (d => d.Path, newDocument.Path),
-            (d => d.Name, newDocument.Name),
-            (d => d.MimeType,newDocument.MimeType)
-            );
+        // var result =await _repository.UpdateOne(
+        //     d => d.Id == id,
+        //     (d => d.Description, newDocument.Description),
+        //     (d => d.Extension, newDocument.Extension),
+        //     (d => d.Path, newDocument.Path),
+        //     (d => d.Name, newDocument.Name),
+        //     (d => d.MimeType,newDocument.MimeType)
+        //     );
+        var result = await _repository.UpdateDocument(id, newDocument);
 
-        if (result > 0 && validateToken.Success)
+        if (result && validateToken.Success)
         {
             var log = ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id);
             //_messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
@@ -119,8 +121,9 @@ public class DocumentService : IDocumentService
 
     public async Task<core.ServerResponse.Response<bool>> Delete(Guid id)
     {
-        var result = await _repository.DeleteOne(d => d.Id == id);
-        if (result > 0)
+        //var result = await _repository.DeleteOne(d => d.Id == id);
+        var result = await _repository.DeleteById(id);
+        if (result)
         {
             return new SuccessResponse<bool>(true);
         }

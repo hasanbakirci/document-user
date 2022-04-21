@@ -1,4 +1,5 @@
-﻿using core.Mongo.MongoContext;
+﻿using System.Linq.Expressions;
+using core.Mongo.MongoContext;
 using core.Mongo.MongoRepository;
 using core.Mongo.MongoSettings;
 using document_service.Models;
@@ -10,7 +11,37 @@ public class DocumentRepository : MongoRepository<Document>,IDocumentRepository
 {
     public DocumentRepository(IMongoContext mongoContext, string collection = "documents") : base(mongoContext,collection) { }
     
-    
+    public async Task<Document> GetById(Guid id)
+    {
+        return await GetBy(d => d.Id == id);
+    }
+
+    public async Task<bool> DeleteById(Guid id)
+    {
+        var result = await DeleteOne(d => d.Id == id);
+        if (result > 0)
+            return true;
+        return false;
+    }
+
+    public async Task<bool> UpdateDocument(Guid id, Document document)
+    {
+        var filter = new[]
+        {
+            ((Expression<Func<Document, object>>, object)) 
+            (d => d.Extension, document.Extension),
+            (d => d.Description, document.Description),
+            (d => d.Path, document.Path),
+            (d => d.Name, document.Name),
+            (d => d.MimeType, document.MimeType)
+        };
+        var result = await UpdateOne(d => d.Id == id, filter);
+        if (result > 0)
+            return true;
+        return false;
+    }
+
+
     // private readonly IMongoCollection<Document> _document;
     // public DocumentRepository(IMongoSettings settings)
     // {

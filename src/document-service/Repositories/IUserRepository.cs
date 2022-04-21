@@ -11,4 +11,9 @@ public interface IUserRepository : IMongoRepository<User>
     // Task<string> Create(User user);
     // Task<bool> Update(Guid id,User user);
     // Task<bool> Delete(Guid id);
+    
+    Task<User> GetById(Guid id);
+    Task<User> GetByEmail(string email);
+    Task<bool> UpdateUser(Guid id,User user);
+    Task<bool> DeleteById(Guid id);
 }
