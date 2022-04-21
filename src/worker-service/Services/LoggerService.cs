@@ -13,8 +13,9 @@ public class LoggerService: ILoggerService
         _loggerRepository = loggerRepository;
     }
 
-    public void Create(CreateLogRequest request)
+    public Guid Create(CreateLogRequest request)
     {
-        _loggerRepository.InsertOne(request.ToLog());
+        var log =_loggerRepository.InsertOne(request.ToLog());
+        return log.Result.Id;
     }
 }

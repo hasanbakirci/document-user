@@ -1,4 +1,7 @@
-﻿using core.Exceptions.CommonExceptions;
+﻿using System.Linq.Expressions;
+using core.Exceptions.CommonExceptions;
+using core.Masstransit;
+using core.Masstransit.Events;
 using core.ServerResponse;
 using document_service.Clients.MessageQueueClient;
 using document_service.Extensions;
@@ -7,11 +10,13 @@ using document_service.Models;
 using document_service.Models.Dtos.Requests;
 using document_service.Models.Dtos.Responses;
 using document_service.Repositories;
+using MassTransit;
 
 namespace document_service.Services;
 
 public class DocumentService : IDocumentService
 {
+    private readonly IBus _bus;
     private readonly IDocumentRepository _repository;
     private readonly IMessageQueueClient _messageQueueClient;
     private readonly IUserService _userService;
@@ -21,15 +26,16 @@ public class DocumentService : IDocumentService
         _repository = repository;
         _messageQueueClient = messageQueueClient;
         _userService = userService;
+        _bus = BusConfigurator.ConfigureBus();
     }
 
-    public async Task<Response<IEnumerable<DocumentResponse>>> GetAll()
+    public async Task<core.ServerResponse.Response<IEnumerable<DocumentResponse>>> GetAll()
     {
         var documents = await _repository.GetAll();
         return new SuccessResponse<IEnumerable<DocumentResponse>>(documents.ToDocumentsResponse());
     }
 
-    public async Task<Response<DocumentResponse>> GetById(Guid id)
+    public async Task<core.ServerResponse.Response<DocumentResponse>> GetById(Guid id)
     {
         var document = await _repository.GetBy(d => d.Id == id);
         if (document is not null)
@@ -41,7 +47,7 @@ public class DocumentService : IDocumentService
         throw new DocumentNotFound(id);
     }
 
-    public async Task<Response<string>> Create(string token,CreateDocumentRequest request)
+    public async Task<core.ServerResponse.Response<string>> Create(string token,CreateDocumentRequest request)
     {
         if (!MimeTypeIsValid(request.FormFile.ContentType))
             throw new MimeTypeException(request.FormFile.ContentType);
@@ -61,8 +67,10 @@ public class DocumentService : IDocumentService
         
         //if (result != null && validateToken.Success)
         //{
-            _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
-            return new SuccessResponse<string>(result.Id.ToString());
+        var log = ConverterExtensions.CreateLog(document, validateToken.Data.Id);
+        //_messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
+        await _bus.Publish<ICreateDocumentEvent>(log);
+        return new SuccessResponse<string>(result.Id.ToString());
         //}
         
         //return new ErrorResponse<string>(ResponseStatus.BadRequest,result,ResultMessage.Error);
@@ -70,7 +78,7 @@ public class DocumentService : IDocumentService
 
     }
 
-    public async Task<Response<bool>> Update(string token,Guid id, UpdateDocumentRequest request)
+    public async Task<core.ServerResponse.Response<bool>> Update(string token,Guid id, UpdateDocumentRequest request)
     {
         if (!MimeTypeIsValid(request.FormFile.ContentType))
             throw new MimeTypeException(request.FormFile.ContentType);
@@ -87,6 +95,7 @@ public class DocumentService : IDocumentService
         };
         
         var validateToken = _userService.ValidateToken(token);
+        //var filter = new[] {((Expression<Func<Document, object>>, object)) (d => d.Extension, newDocument.Extension)};
         var result =await _repository.UpdateOne(
             d => d.Id == id,
             (d => d.Description, newDocument.Description),
@@ -98,7 +107,9 @@ public class DocumentService : IDocumentService
 
         if (result > 0 && validateToken.Success)
         {
-            _messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
+            var log = ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id);
+            //_messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
+            await _bus.Publish<IUpdateDocumentEvent>(log);
             return new SuccessResponse<bool>(true);
         }
         
@@ -106,7 +117,7 @@ public class DocumentService : IDocumentService
         throw new DocumentNotFound(id);
     }
 
-    public async Task<Response<bool>> Delete(Guid id)
+    public async Task<core.ServerResponse.Response<bool>> Delete(Guid id)
     {
         var result = await _repository.DeleteOne(d => d.Id == id);
         if (result > 0)

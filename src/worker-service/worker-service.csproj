@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
         <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
         <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
