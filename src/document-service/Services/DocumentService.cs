@@ -16,17 +16,19 @@ namespace document_service.Services;
 
 public class DocumentService : IDocumentService
 {
+    //private readonly IPublishEndpoint _publishEndpoint;
     private readonly IBus _bus;
     private readonly IDocumentRepository _repository;
-    private readonly IMessageQueueClient _messageQueueClient;
+    //private readonly IMessageQueueClient _messageQueueClient;
     private readonly IUserService _userService;
 
-    public DocumentService(IDocumentRepository repository, IMessageQueueClient messageQueueClient, IUserService userService)
+    public DocumentService(IDocumentRepository repository, IUserService userService, IBus bus)
     {
         _repository = repository;
-        _messageQueueClient = messageQueueClient;
+        //_messageQueueClient = messageQueueClient;
         _userService = userService;
-        _bus = BusConfigurator.ConfigureBus();
+        _bus = bus;
+        //_bus = BusConfigurator.ConfigureBus();
     }
 
     public async Task<core.ServerResponse.Response<IEnumerable<DocumentResponse>>> GetAll()

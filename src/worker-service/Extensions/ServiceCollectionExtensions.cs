@@ -34,14 +34,14 @@ public static class ServiceCollectionExtensions
     
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddSingleton<ILoggerService, LoggerService>();
-        services.AddHostedService<Worker>();
+        services.AddScoped<ILoggerService, LoggerService>();
+        //services.AddHostedService<Worker>();
         return services;
     }
     
     public static IServiceCollection AddClients(this IServiceCollection services)
     {
-        services.AddSingleton<IMessageQueueClient, RabbitMQClient>();
+        //services.AddSingleton<IMessageQueueClient, RabbitMQClient>();
         return services;
     }
 }

@@ -1,6 +1,9 @@
+using core.Masstransit.Events;
 using core.Middleware;
 using document_service.Extensions;
+using MassTransit;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using Serilog;
 using Serilog.Events;
 
@@ -13,6 +16,7 @@ builder.Services.AddRepositories(builder.Configuration);
 builder.Services.AddServices();
 builder.Services.AddClients();
 builder.Services.AddUtilities();
+builder.Services.AddMassTransitCfg();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
