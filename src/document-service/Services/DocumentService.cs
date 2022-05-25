@@ -16,13 +16,12 @@ namespace document_service.Services;
 
 public class DocumentService : IDocumentService
 {
-    //private readonly IPublishEndpoint _publishEndpoint;
     private readonly IBus _bus;
     private readonly IDocumentRepository _repository;
     //private readonly IMessageQueueClient _messageQueueClient;
     private readonly IUserService _userService;
 
-    public DocumentService(IDocumentRepository repository, IUserService userService, IBus bus)
+    public DocumentService(IDocumentRepository repository, IUserService userService,IBus bus)
     {
         _repository = repository;
         //_messageQueueClient = messageQueueClient;
@@ -72,7 +71,9 @@ public class DocumentService : IDocumentService
         //{
         var log = ConverterExtensions.CreateLog(document, validateToken.Data.Id);
         //_messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(document,validateToken.Data.Id));
-        await _bus.Publish<ICreateDocumentEvent>(log);
+        log.IsCreate = true;
+        Console.WriteLine(log.IsCreate);
+        await _bus.Publish<IRequestDocumentEvent>(log);
         return new SuccessResponse<string>(result.Id.ToString());
         //}
         
@@ -113,7 +114,8 @@ public class DocumentService : IDocumentService
         {
             var log = ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id);
             //_messageQueueClient.Publish(RabbitMQHelper.LoggerQueue,ConverterExtensions.CreateLog(newDocument, validateToken.Data.Id));
-            await _bus.Publish<IUpdateDocumentEvent>(log);
+            log.IsCreate = false;
+            await _bus.Publish<IRequestDocumentEvent>(log);
             return new SuccessResponse<bool>(true);
         }
         

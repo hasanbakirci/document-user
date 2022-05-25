@@ -5,7 +5,7 @@ using worker_service.Services;
 
 namespace worker_service.Consumers;
 
-public class CreateDocumentEventConsumer : IConsumer<ICreateDocumentEvent>
+public class CreateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
 {
     private readonly ILoggerService _loggerService;
     
@@ -14,11 +14,10 @@ public class CreateDocumentEventConsumer : IConsumer<ICreateDocumentEvent>
         _loggerService = loggerService;
     }
     
-    public Task Consume(ConsumeContext<ICreateDocumentEvent> context)
+    public Task Consume(ConsumeContext<IRequestDocumentEvent> context)
     {
         //Console.WriteLine($"#CCCCC# {context.Message.Description} isimli dosya create event ile iletildi.");
-        
-         var result = _loggerService.Create(new CreateLogRequest
+        var result = _loggerService.Create(new CreateLogRequest
          {
              Description = context.Message.Description,
              Extension = context.Message.Extension,
@@ -30,7 +29,7 @@ public class CreateDocumentEventConsumer : IConsumer<ICreateDocumentEvent>
              DocumentCreatedAt = context.Message.DocumentCreatedAt,
              DocumentUpdatedAt = context.Message.DocumentUpdatedAt
          });
-        Console.WriteLine($"---- {result}  ----");
+        Console.WriteLine($"--create-- {result}  ----");
         return Task.CompletedTask;
     }
 }

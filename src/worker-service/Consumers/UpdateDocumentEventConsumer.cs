@@ -5,7 +5,7 @@ using worker_service.Services;
 
 namespace worker_service.Consumers;
 
-public class UpdateDocumentEventConsumer : IConsumer<IUpdateDocumentEvent>
+public class UpdateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
 {
     private readonly ILoggerService _loggerService;
 
@@ -14,7 +14,7 @@ public class UpdateDocumentEventConsumer : IConsumer<IUpdateDocumentEvent>
         _loggerService = loggerService;
     }
 
-    public Task Consume(ConsumeContext<IUpdateDocumentEvent> context)
+    public Task Consume(ConsumeContext<IRequestDocumentEvent> context)
     {
         //Console.WriteLine($"#UUUUU# {context.Message.Description} isimli dosya update event ile iletildi.");
         
@@ -30,7 +30,7 @@ public class UpdateDocumentEventConsumer : IConsumer<IUpdateDocumentEvent>
             DocumentCreatedAt = context.Message.DocumentCreatedAt,
             DocumentUpdatedAt = context.Message.DocumentUpdatedAt
         });
-        Console.WriteLine($"---- {result} ----");
+        Console.WriteLine($"--update-- {result} ----");
         return Task.CompletedTask;
     }
 }

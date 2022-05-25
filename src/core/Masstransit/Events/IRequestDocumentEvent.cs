@@ -1,17 +1,15 @@
-﻿using core.Mongo;
+﻿namespace core.Masstransit.Events;
 
-namespace worker_service.Models;
-
-public class Log : BaseDocument
+public interface IRequestDocumentEvent
 {
-    public string DocumentId { get; set; }
+    public bool IsCreate { get; set; }
+    public Guid DocumentId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string Extension { get; set; }
     public string Path { get; set; }
-    public string MimeType  { get; set; }
+    public string MimeType { get; set; }
     public DateTime DocumentCreatedAt { get; set; }
     public DateTime DocumentUpdatedAt { get; set; }
-    public string UserId { get; set; }
-
+    public Guid UserId { get; set; }
 }

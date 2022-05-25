@@ -29,28 +29,23 @@ public static class MassTransitExtensions
                 cfg.ReceiveEndpoint("create-request-queue", re =>
                 {
                     re.ConfigureConsumeTopology = false;
-                    re.SetQuorumQueue();
-                    
-                    re.SetExchangeArgument("declare","lazy");
-                    //re.Consumer(() => new CreateDocumentEventConsumer());
+
                     re.ConfigureConsumer<CreateDocumentEventConsumer>(context);
-                    re.Bind("create-request-exchange", e =>
+                    re.Bind("request-exchange", e =>
                     {
-                        e.RoutingKey = "create";
-                        e.ExchangeType = ExchangeType.Direct;
+                        e.RoutingKey = "create.*";
+                        e.ExchangeType = ExchangeType.Topic;
                     });
                 });
                 cfg.ReceiveEndpoint("update-request-queue", re =>
                 {
                     re.ConfigureConsumeTopology = false;
-                    re.SetQuorumQueue();
-                    
-                    re.SetExchangeArgument("declare","lazy");
+
                     re.ConfigureConsumer<UpdateDocumentEventConsumer>(context);
-                    re.Bind("update-request-exchange", e =>
+                    re.Bind("request-exchange", e =>
                     {
-                        e.RoutingKey = "update";
-                        e.ExchangeType = ExchangeType.Direct;
+                        e.RoutingKey = "update.*";
+                        e.ExchangeType = ExchangeType.Topic;
                     });
                 });
             });
