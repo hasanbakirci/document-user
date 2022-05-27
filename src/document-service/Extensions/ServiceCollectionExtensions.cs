@@ -5,6 +5,7 @@ using document_service.Helpers.JWT;
 using document_service.Repositories;
 using document_service.Services;
 using MassTransit;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 
@@ -35,6 +36,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddMediatR(typeof(Program));
         services.AddSingleton<IDocumentService, DocumentService>();
         // services.AddSingleton<IDocumentService, DocumentService>(sp => new DocumentService(
         //     sp.GetRequiredService<IDocumentRepository>(),
