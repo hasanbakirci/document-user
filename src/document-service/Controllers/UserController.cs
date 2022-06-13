@@ -1,7 +1,5 @@
 ﻿using core.Api;
 using document_service.ActionFilters;
-using document_service.CQRS.UserOperations.Commands;
-using document_service.CQRS.UserOperations.Queries;
 using document_service.Models.Dtos.Requests;
 using document_service.Services;
 using MediatR;
@@ -14,54 +12,47 @@ namespace document_service.Controllers;
 public class UserController : ApiController
 {
     private readonly IUserService _service;
-    private readonly IMediator _mediator;
 
     public UserController(IUserService service, IMediator mediator)
     {
         _service = service;
-        _mediator = mediator;
     }
         
     [HttpGet]
     public async Task<IActionResult>  GetAll()
     {
-        // var users = await _service.GetAll();
-        // return ApiResponse(users);
-        return ApiResponse(await _mediator.Send(new GetUsersQuery()));
+        var users = await _service.GetAll();
+        return ApiResponse(users);
     }
         
     [HttpGet("Search/{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        // var user = await _service.GetById(id);
-        // return ApiResponse(user);
-        return ApiResponse(await _mediator.Send(new GetUserByIdQuery(){Id = id}));
+        var user = await _service.GetById(id);
+        return ApiResponse(user);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserRequest request)
     {
-        // var result = await _service.Create(request);
-        // return ApiResponse(result);
-        return ApiResponse(await _mediator.Send(new CreateUserCommand(){CreateUserRequest = request}));
+        var result = await _service.Create(request);
+        return ApiResponse(result);
     }
     
-    [RoleFilter("admin")]
+    //[RoleFilter("admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id,UpdateUserRequest request)
     { 
-        // var result = await _service.Update(id,request);
-        // return ApiResponse(result);
-        return ApiResponse(await _mediator.Send(new UpdateUserCommand(){Id = id,UpdateUserRequest = request}));
+        var result = await _service.Update(id,request);
+        return ApiResponse(result);
     }
     
-    [RoleFilter("admin")]
+    //[RoleFilter("admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        // var result = await _service.Delete(id);
-        // return ApiResponse(result);
-        return ApiResponse(await _mediator.Send(new DeleteUserCommand(){Id = id}));
+        var result = await _service.Delete(id);
+        return ApiResponse(result);
     }
     
     [HttpPost("Login")]

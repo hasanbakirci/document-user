@@ -46,20 +46,20 @@ public class DocumentController: ApiController
     [HttpPost]
     public async Task<IActionResult> Create(IFormFile file, string description)
     {
-        var request = new CreateDocumentRequest {FormFile = file, Description = description};
+        //var request = new CreateDocumentRequest {FormFile = file, Description = description};
         // var result = await _service.Create(TokenHandler(Request),request);
         // return ApiResponse(result);
-        return ApiResponse(await _mediator.Send(new CreateDocumentCommand(){CreateDocumentRequest = request,Token = TokenHandler(Request)}));
+        return ApiResponse(await _mediator.Send(new CreateDocumentCommand(){FormFile = file, Description = description,Token = TokenHandler(Request)}));
     }
     
     [RoleFilter("admin")]
     [HttpPut("{id}/{description}")]
     public async Task<IActionResult> Update(IFormFile file,string id, string description)
     {
-        var request = new UpdateDocumentRequest {FormFile = file, Description = description};
+        //var request = new UpdateDocumentRequest {FormFile = file, Description = description};
         // var result = await _service.Update(TokenHandler(Request),Guid.Parse(id),request);
         // return ApiResponse(result);
-        return ApiResponse(await _mediator.Send(new UpdateDocumentCommand(){Id = Guid.Parse(id),Token = TokenHandler(Request),UpdateDocumentRequest = request}));
+        return ApiResponse(await _mediator.Send(new UpdateDocumentCommand(){Id = Guid.Parse(id),Token = TokenHandler(Request),FormFile= file,Description = description}));
     }
 
     [HttpDelete("{id}")]

@@ -1,5 +1,5 @@
 ﻿using core.Mongo.MongoContext;
-using core.Mongo.MongoSettings;
+using core.Settings;
 using document_service.Clients.MessageQueueClient;
 using document_service.Helpers.JWT;
 using document_service.Repositories;
@@ -8,6 +8,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using MongoSettings = core.Mongo.MongoSettings.MongoSettings;
 
 namespace document_service.Extensions;
 
