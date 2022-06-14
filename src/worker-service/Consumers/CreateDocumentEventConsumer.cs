@@ -1,5 +1,6 @@
 ﻿using core.Masstransit.Events;
 using MassTransit;
+using worker_service.Models;
 using worker_service.Models.Requests;
 using worker_service.Services;
 
@@ -7,18 +8,19 @@ namespace worker_service.Consumers;
 
 public class CreateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
 {
-    private readonly ILoggerService _loggerService;
+    private readonly IElasticSearchService _elasticSearchService;
     
-    public CreateDocumentEventConsumer(ILoggerService loggerService)
+    public CreateDocumentEventConsumer(IElasticSearchService elasticSearchService)
     {
-        _loggerService = loggerService;
+        _elasticSearchService = elasticSearchService;
     }
     
     public Task Consume(ConsumeContext<IRequestDocumentEvent> context)
     {
         //Console.WriteLine($"#CCCCC# {context.Message.Description} isimli dosya create event ile iletildi.");
-        var result = _loggerService.Create(new CreateLogRequest
+        var result = _elasticSearchService.InsertLog(new Log()
          {
+             Id = Guid.NewGuid(),
              Description = context.Message.Description,
              Extension = context.Message.Extension,
              Name = context.Message.Name,
@@ -27,23 +29,10 @@ public class CreateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
              MimeType = context.Message.MimeType,
              UserId = context.Message.UserId.ToString(),
              DocumentCreatedAt = context.Message.DocumentCreatedAt,
-             DocumentUpdatedAt = context.Message.DocumentUpdatedAt
+             DocumentUpdatedAt = context.Message.DocumentUpdatedAt,
+             Status = "Create"
          });
         Console.WriteLine($"--create-- {result}  ----");
         return Task.CompletedTask;
-    }
-}
-
-public class CreateDocumentEventConsumerDefinition : ConsumerDefinition<CreateDocumentEventConsumer>{
-    public CreateDocumentEventConsumerDefinition()
-    {
-        EndpointName = "create-request-queue";
-        ConcurrentMessageLimit = 10;
-    }
-
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<CreateDocumentEventConsumer> consumerConfigurator)
-    {
-        endpointConfigurator.UseMessageRetry(r => r.Intervals(100,200,500,800,1000));
-        endpointConfigurator.UseInMemoryOutbox();
     }
 }

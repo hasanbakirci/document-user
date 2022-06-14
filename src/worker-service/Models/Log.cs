@@ -2,8 +2,9 @@
 
 namespace worker_service.Models;
 
-public class Log : BaseDocument
+public class Log
 {
+    public Guid Id { get; set; }
     public string DocumentId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
@@ -13,5 +14,6 @@ public class Log : BaseDocument
     public DateTime DocumentCreatedAt { get; set; }
     public DateTime DocumentUpdatedAt { get; set; }
     public string UserId { get; set; }
+    public string Status { get; set; }
 
 }

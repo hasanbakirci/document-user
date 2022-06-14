@@ -10,7 +10,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         //services.AddHostedService<Worker>();
         services.AddRepositories(hostContext.Configuration);
-        services.AddServices();
+        services.AddServices(hostContext.Configuration);
         services.AddClients();
         services.AddMassTransitCfg();
     })

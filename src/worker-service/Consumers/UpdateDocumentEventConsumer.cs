@@ -1,5 +1,6 @@
 ﻿using core.Masstransit.Events;
 using MassTransit;
+using worker_service.Models;
 using worker_service.Models.Requests;
 using worker_service.Services;
 
@@ -7,19 +8,20 @@ namespace worker_service.Consumers;
 
 public class UpdateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
 {
-    private readonly ILoggerService _loggerService;
+    private readonly IElasticSearchService _elasticSearchService;
 
-    public UpdateDocumentEventConsumer(ILoggerService loggerService)
+    public UpdateDocumentEventConsumer(IElasticSearchService elasticSearchService)
     {
-        _loggerService = loggerService;
+        _elasticSearchService = elasticSearchService;
     }
 
     public Task Consume(ConsumeContext<IRequestDocumentEvent> context)
     {
         //Console.WriteLine($"#UUUUU# {context.Message.Description} isimli dosya update event ile iletildi.");
         
-        var result =_loggerService.Create(new CreateLogRequest
+        var result =_elasticSearchService.InsertLog(new Log
         {
+            Id = Guid.NewGuid(),
             Description = context.Message.Description,
             Extension = context.Message.Extension,
             Name = context.Message.Name,
@@ -28,24 +30,10 @@ public class UpdateDocumentEventConsumer : IConsumer<IRequestDocumentEvent>
             MimeType = context.Message.MimeType,
             UserId = context.Message.UserId.ToString(),
             DocumentCreatedAt = context.Message.DocumentCreatedAt,
-            DocumentUpdatedAt = context.Message.DocumentUpdatedAt
+            DocumentUpdatedAt = context.Message.DocumentUpdatedAt,
+            Status = "Update"
         });
         Console.WriteLine($"--update-- {result} ----");
         return Task.CompletedTask;
-    }
-}
-
-public class UpdateDocumentEventConsumerDefinition : ConsumerDefinition<UpdateDocumentEventConsumer>
-{
-    public UpdateDocumentEventConsumerDefinition()
-    {
-        EndpointName = "update-request-queue";
-        ConcurrentMessageLimit = 10;
-    }
-
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<UpdateDocumentEventConsumer> consumerConfigurator)
-    {
-        endpointConfigurator.UseMessageRetry(r => r.Intervals(100,200,500,800,1000));
-        endpointConfigurator.UseInMemoryOutbox();
     }
 }

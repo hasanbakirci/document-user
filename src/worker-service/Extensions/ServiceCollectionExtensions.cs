@@ -1,9 +1,11 @@
 ﻿using core.Mongo.MongoContext;
 using core.Mongo.MongoSettings;
+using core.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Nest;
 using worker_service.Clients.MessageQueueClient;
 using worker_service.Repositories;
 using worker_service.Services;
@@ -26,15 +28,18 @@ public static class ServiceCollectionExtensions
         var mongoContext = new MongoContext(mongoClient, settings.Database);
 
         services.AddSingleton<IMongoContext, MongoContext>(m => mongoContext);
-            
-        services.AddSingleton<ILoggerRepository, LoggerRepository>();
+        
             
         return services;
     }
     
-    public static IServiceCollection AddServices(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ILoggerService, LoggerService>();
+        ElasticSearchSettings settings = configuration.GetSection("ElasticSearchSettings").Get<ElasticSearchSettings>();
+        
+        var connection = new ConnectionSettings(new Uri(settings.Server));
+        var client = new ElasticClient(connection);
+        services.AddSingleton<IElasticSearchService, ElasticSearchService>(x => new ElasticSearchService(client));
         //services.AddHostedService<Worker>();
         return services;
     }
